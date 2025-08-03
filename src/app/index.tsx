@@ -1,6 +1,5 @@
 import Post from "@/components/Post/Post";
 import { PostType } from "@/components/Post/PostContext";
-import { ThemeInfo } from "@/components/ThemeInfo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { generatePosts } from "@/utils/postGenerator";
 import { FlashList } from "@shopify/flash-list";
@@ -48,8 +47,8 @@ export default function Home() {
       <View className="px-4 ml-auto">
         <ThemeToggle />
       </View>
-      <ThemeInfo />
       <FlashList
+        estimatedItemSize={100}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
