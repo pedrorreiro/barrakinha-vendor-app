@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+* {
+  --color-background: #fafafb;
+  --color-foreground: #0f1215;
+  --color-primary: #6d8af3;
+}
+
+.dark * {
+  --color-background: #0f1215;
+  --color-foreground: #fafafb;
+  --color-primary: #6d8af3;
+}
+
+@layer components {
+  .username {
+    @apply text-foreground font-bold;
+  }
+}

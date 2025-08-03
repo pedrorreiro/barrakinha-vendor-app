@@ -6,10 +6,6 @@
     "web": {
       "output": "static"
     },
-    "plugins": [
-      "expo-router"
-    ],
-    "name": "poc-instagram",
-    "slug": "poc-instagram"
+    "plugins": ["expo-router"]
   }
 }

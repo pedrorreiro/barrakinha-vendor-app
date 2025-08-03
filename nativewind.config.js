@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+/** @type {import('nativewind').Config} */
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
@@ -11,9 +11,6 @@ module.exports = {
         foreground: "var(--color-foreground)",
       },
     },
-  },
-  future: {
-    hoverOnlyWhenSupported: true,
   },
   plugins: [],
 };
