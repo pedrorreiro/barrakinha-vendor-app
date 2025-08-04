@@ -1,4 +1,5 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { cssInterop } from "nativewind";
 import React from "react";
 import { Switch, Text, View } from "react-native";
 import { useTheme } from "../hooks/useTheme";
@@ -6,13 +7,22 @@ import { useTheme } from "../hooks/useTheme";
 export function ThemeToggle() {
   const { colorScheme, toggleTheme } = useTheme();
 
+  cssInterop(MaterialCommunityIcons, {
+    color: {
+      target: "color",
+      nativeStyleToProp: {
+        color: "color",
+      },
+    },
+  });
+
   return (
     <View className="flex-row items-center gap-4">
       <Text className="text-foreground font-medium">
         <MaterialCommunityIcons
+          color="text-foreground"
           name={colorScheme === "dark" ? "weather-night" : "weather-sunny"}
           size={24}
-          color={colorScheme === "dark" ? "white" : "black"}
         />
       </Text>
       <Switch

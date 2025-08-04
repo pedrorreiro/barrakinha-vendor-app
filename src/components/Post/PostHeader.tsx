@@ -1,12 +1,20 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useColorScheme } from "nativewind";
+import { cssInterop } from "nativewind";
 import { Text, View } from "react-native";
 import { Avatar } from "../Avatar";
 import { usePostContext } from "./PostContext";
 
 export const PostHeader = () => {
-  const { colorScheme } = useColorScheme();
   const post = usePostContext();
+
+  cssInterop(MaterialCommunityIcons, {
+    color: {
+      target: "color",
+      nativeStyleToProp: {
+        color: "color",
+      },
+    },
+  });
 
   return (
     <View className="flex-row items-center px-4 gap-2 pb-4">
@@ -18,7 +26,7 @@ export const PostHeader = () => {
       <MaterialCommunityIcons
         name="dots-horizontal"
         size={24}
-        color={colorScheme === "dark" ? "white" : "black"}
+        color="text-foreground"
         className="ml-auto"
       />
     </View>
