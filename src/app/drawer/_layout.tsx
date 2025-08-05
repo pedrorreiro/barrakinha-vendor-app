@@ -1,6 +1,7 @@
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { MaterialIcons } from "@expo/vector-icons";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
@@ -62,53 +63,59 @@ export default function Layout() {
   const textColor = colorScheme === "dark" ? "#fafafb" : "#0f1215";
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Drawer
-        screenOptions={{
-          headerShown: true,
+      <BottomSheetModalProvider>
+        <Drawer
+          screenOptions={{
+            headerShown: true,
 
-          drawerStyle: {
-            backgroundColor,
-          },
-          headerStyle: {
-            backgroundColor,
-          },
-          headerRight: () => <ThemeToggle />,
-        }}
-        drawerContent={CustomDrawerContent}
-      >
-        <Drawer.Screen
-          name="home"
-          options={{
-            headerTitle: "",
-            title: "Página Inicial",
-            drawerLabelStyle: {
-              color: textColor,
+            drawerStyle: {
+              backgroundColor,
             },
-            drawerActiveTintColor: textColor,
-            drawerIcon: ({ size }) => (
-              <MaterialIcons name="home" color="text-foreground" size={size} />
-            ),
-          }}
-        />
-        <Drawer.Screen
-          name="settings"
-          options={{
-            headerTitle: "",
-            title: "Configurações",
-            drawerLabelStyle: {
-              color: textColor,
+            headerStyle: {
+              backgroundColor,
             },
-            drawerActiveTintColor: textColor,
-            drawerIcon: ({ size }) => (
-              <MaterialIcons
-                name="settings"
-                color="text-foreground"
-                size={size}
-              />
-            ),
+            headerRight: () => <ThemeToggle />,
           }}
-        />
-      </Drawer>
+          drawerContent={CustomDrawerContent}
+        >
+          <Drawer.Screen
+            name="home"
+            options={{
+              headerTitle: "",
+              title: "Página Inicial",
+              drawerLabelStyle: {
+                color: textColor,
+              },
+              drawerActiveTintColor: textColor,
+              drawerIcon: ({ size }) => (
+                <MaterialIcons
+                  name="home"
+                  color="text-foreground"
+                  size={size}
+                />
+              ),
+            }}
+          />
+          <Drawer.Screen
+            name="settings"
+            options={{
+              headerTitle: "",
+              title: "Configurações",
+              drawerLabelStyle: {
+                color: textColor,
+              },
+              drawerActiveTintColor: textColor,
+              drawerIcon: ({ size }) => (
+                <MaterialIcons
+                  name="settings"
+                  color="text-foreground"
+                  size={size}
+                />
+              ),
+            }}
+          />
+        </Drawer>
+      </BottomSheetModalProvider>
     </GestureHandlerRootView>
   );
 }

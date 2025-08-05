@@ -1,20 +1,8 @@
+import { Post } from "@/hooks/usePostActions";
 import { createContext, useContext } from "react";
 
-export type PostType = {
-  id: string;
-  image: string;
-  content: string;
-  likes: number;
-  comments: number;
-  user: {
-    name: string;
-    avatar: string;
-  };
-  createdAt: Date;
-};
-
 // Context para compartilhar dados do post
-export const PostContext = createContext<PostType | null>(null);
+export const PostContext = createContext<Post | null>(null);
 
 // Hook para usar o contexto do post
 export const usePostContext = () => {

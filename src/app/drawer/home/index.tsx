@@ -1,6 +1,7 @@
 import Post from "@/components/Post/Post";
-import { PostType } from "@/components/Post/PostContext";
+
 import { useAuth } from "@/hooks/useAuth";
+import { Post as PostType } from "@/hooks/usePostActions";
 import { generatePosts } from "@/utils/postGenerator";
 import { FlashList } from "@shopify/flash-list";
 import React, { useEffect, useState } from "react";
