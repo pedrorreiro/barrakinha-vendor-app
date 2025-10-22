@@ -9,13 +9,13 @@ export const PostDetails = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
-    const fullText = `${post.user.name} ${post.content}`;
+    const fullText = `${post.user.username} ${post.description}`;
     const words = fullText.split(" ").length;
     // Se tem mais de 15 palavras, provavelmente vai precisar de mais de 2 linhas
     if (words > 15) {
       setShowMore(true);
     }
-  }, [post.user.name, post.content]);
+  }, [post.user.username, post.description]);
 
   return (
     <View className="px-4 gap-2">
@@ -24,13 +24,13 @@ export const PostDetails = () => {
         numberOfLines={isExpanded ? undefined : 2}
         ellipsizeMode="tail"
       >
-        <Text className="username">{post.user.name} </Text>
+        <Text className="username">{post.user.username} </Text>
         <Text
           className="text-justify hyphens-auto"
           lineBreakStrategyIOS="push-out"
           textBreakStrategy="simple"
         >
-          {post.content}
+          {post.description}
         </Text>
       </Text>
 

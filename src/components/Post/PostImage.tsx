@@ -48,7 +48,7 @@ export const PostImage = () => {
     <View className="items-center relative">
       {isLoading && <PostImageSkeleton />}
       <Image
-        source={{ uri: post.image }}
+        source={{ uri: post.photoUrl }}
         className="w-full h-80"
         resizeMode="cover"
         onLoadStart={handleLoadStart}

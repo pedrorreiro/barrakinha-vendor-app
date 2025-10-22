@@ -1,7 +1,7 @@
 import { ACTION_COLORS } from "@/constants/colors";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useColorScheme } from "nativewind";
-import { PostActionButton } from "./PostActionButton";
+import { PostActionButton } from "./PostActionContainer";
 
 type LikeButtonProps = {
   isLiked: boolean;

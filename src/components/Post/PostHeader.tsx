@@ -18,9 +18,9 @@ export const PostHeader = () => {
 
   return (
     <View className="flex-row items-center px-4 gap-2 pb-4">
-      <View className="flex-row items-center gap-2">
-        <Avatar avatar={post.user.avatar} />
-        <Text className="username">{post.user.name}</Text>
+      <View className="flex-row items-center gap-4">
+        <Avatar avatar={post.user.avatarUrl} />
+        <Text className="username">{post.user.username}</Text>
       </View>
 
       <MaterialCommunityIcons

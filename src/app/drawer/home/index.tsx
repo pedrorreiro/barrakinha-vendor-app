@@ -1,79 +1,113 @@
-import Post from "@/components/Post/Post";
-
-import { useAuth } from "@/hooks/useAuth";
-import { Post as PostType } from "@/hooks/usePostActions";
-import { generatePosts } from "@/utils/postGenerator";
-import { FlashList } from "@shopify/flash-list";
-import React, { useEffect, useState } from "react";
+import React from 'react';
 import {
-  ActivityIndicator,
-  RefreshControl,
+  StyleSheet,
   SafeAreaView,
   View,
-} from "react-native";
-import { useTheme } from "../../../hooks/useTheme";
+  Image,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
 
 export default function Home() {
-  const { colorScheme } = useTheme();
-  const { logout } = useAuth();
-
-  const refreshControlColor = colorScheme === "dark" ? "white" : "black";
-
-  const [posts, setPosts] = useState<PostType[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
-
-  function setFetching(value: boolean, firstFetch: boolean = false) {
-    if (firstFetch) {
-      setRefreshing(value);
-    } else {
-      setLoadingMore(value);
-    }
-  }
-
-  async function fetchPosts(firstFetch: boolean = false) {
-    if (refreshing) return;
-    setFetching(true, firstFetch);
-    const newPosts = await generatePosts(5);
-    setPosts([...posts, ...newPosts]);
-    setFetching(false, firstFetch);
-  }
-
-  useEffect(() => {
-    fetchPosts(true);
-  }, []);
-
   return (
-    <SafeAreaView className="flex flex-1 bg-background">
-      <FlashList
-        estimatedItemSize={100}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={fetchPosts}
-            colors={[refreshControlColor]}
-            tintColor={refreshControlColor}
-          />
-        }
-        data={posts}
-        renderItem={({ item }) => (
-          <View className="mb-8">
-            <Post post={item} />
-          </View>
-        )}
-        onEndReached={async () => {
-          await fetchPosts(false);
-        }}
-        keyExtractor={(item) => item.id}
-        className="mt-4"
-        ListFooterComponent={
-          loadingMore && (
-            <View className="py-4">
-              <ActivityIndicator color={refreshControlColor} size="small" />
-            </View>
-          )
-        }
-      />
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#F4EFF3' }}>
+      <View style={styles.container}>
+        
+          <Text style={styles.title}>Home</Text>
+      </View>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 24,
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 0,
+  },
+  hero: {
+    width: 300,
+    height: 300,
+    marginVertical: 24,
+    alignSelf: 'center',
+  },
+  title: {
+    fontSize: 34,
+    fontWeight: 'bold',
+    color: '#181818',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: '500',
+    color: '#889797',
+    textAlign: 'center',
+  },
+  /** Content */
+  content: {
+    marginTop: 'auto',
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 0,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  contentButtons: {
+    width: '100%',
+    marginTop: 36,
+    marginBottom: 'auto',
+  },
+  contentFooter: {
+    fontSize: 15,
+    lineHeight: 22,
+    fontWeight: '400',
+    color: '#9fa5af',
+    textAlign: 'center',
+  },
+  contentLink: {
+    color: '#45464E',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+    textDecorationColor: 'black',
+    textDecorationStyle: 'solid',
+  },
+  /** Button */
+  btn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderWidth: 1,
+    backgroundColor: '#F82E08',
+    borderColor: '#F82E08',
+  },
+  btnText: {
+    fontSize: 17,
+    lineHeight: 22,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  btnEmpty: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderWidth: 1.5,
+    backgroundColor: 'transparent',
+    borderColor: '#F82E08',
+    marginTop: 12,
+  },
+  btnEmptyText: {
+    fontSize: 17,
+    lineHeight: 22,
+    fontWeight: 'bold',
+    color: '#F82E08',
+  },
+});

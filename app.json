@@ -16,7 +16,7 @@
       }
     },
     "ios": {
-      "bundleIdentifier": "com.pedrorreiro.pocinstagram",
+      "bundleIdentifier": "com.barrakinha.barrakinhavendedor",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }

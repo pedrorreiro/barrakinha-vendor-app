@@ -3,15 +3,25 @@
 @tailwind utilities;
 
 * {
-  --color-background: #fafafb;
-  --color-foreground: #0f1215;
-  --color-primary: #6d8af3;
+  --color-background: #F4EFF3;
+  --color-foreground: #181818;
+  --color-primary: #F82E08;
+  --color-secondary: #889797;
+  --color-muted: #9fa5af;
+  --color-accent: #45464E;
+  --color-card: #ffdada;
+  --color-border: #F82E08;
 }
 
 .dark * {
   --color-background: #0f1215;
   --color-foreground: #fafafb;
-  --color-primary: #6d8af3;
+  --color-primary: #F82E08;
+  --color-secondary: #889797;
+  --color-muted: #9fa5af;
+  --color-accent: #45464E;
+  --color-card: #ffdada;
+  --color-border: #F82E08;
 }
 
 @layer components {

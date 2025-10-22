@@ -1,9 +1,9 @@
 import { usePostActions } from "@/hooks/usePostActions";
 import React from "react";
 import { View } from "react-native";
-import { CommentButton } from "../CommentButton";
+import { CommentButton } from "../PostAction/CommentButton";
 import { CommentSheet } from "../CommentSheet";
-import { LikeButton } from "../LikeButton";
+import { LikeButton } from "../PostAction/LikeButton";
 import { usePostContext } from "./PostContext";
 
 export const PostActions = () => {
@@ -12,12 +12,13 @@ export const PostActions = () => {
     isLiked,
     likeCount,
     isCommented,
-    comments,
+    commentCount,
     bottomSheetModalRef,
     handleLike,
     handleComment,
     handleAddComment,
-  } = usePostActions(post.likes, post.comments);
+    comments,
+  } = usePostActions(post);
 
   return (
     <>
@@ -29,7 +30,7 @@ export const PostActions = () => {
         />
         <CommentButton
           isCommented={isCommented}
-          commentCount={post.comments.length}
+          commentCount={commentCount}
           onPress={handleComment}
         />
       </View>

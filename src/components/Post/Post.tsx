@@ -1,20 +1,12 @@
-import React from "react";
-import { View } from "react-native";
+import { Post as PostType } from "../../hooks/usePostActions";
 import { PostActions } from "./PostActions";
-import { PostContext, PostType } from "./PostContext";
 import { PostDetails } from "./PostDetails";
 import { PostHeader } from "./PostHeader";
 import { PostImage } from "./PostImage";
+import { PostRoot } from "./PostRoot";
 
 export const Post = {
-  Root: ({ post, children }: { post: PostType; children: React.ReactNode }) => {
-    return (
-      <PostContext.Provider value={post}>
-        <View className="bg-background">{children}</View>
-      </PostContext.Provider>
-    );
-  },
-
+  Root: PostRoot,
   Header: PostHeader,
   Image: PostImage,
   Actions: PostActions,

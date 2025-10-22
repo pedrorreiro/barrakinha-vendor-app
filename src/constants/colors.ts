@@ -7,7 +7,6 @@ export const ACTION_COLORS = {
     },
   },
   comment: {
-    active: "#0095f6",
     inactive: {
       light: "black",
       dark: "white",
