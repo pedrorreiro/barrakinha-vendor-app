@@ -7,8 +7,9 @@ import PhoneInput from "@/components/PhoneInput";
 import CustomTextInput from "@/components/CustomTextInput";
 import Button from "@/components/Button";
 import { registerSchema, RegisterFormData } from "@/schemas/register";
-
+import { useRouter } from "expo-router";
 export default function Register() {
+  const router = useRouter();
   const {
     control,
     handleSubmit,
@@ -26,6 +27,13 @@ export default function Register() {
 
   const onSubmit = (data: RegisterFormData) => {
     console.log("Formulário válido:", data);
+
+    // chama o endpoint de criar loja
+
+    router.push({
+      pathname: "/otp-code/[phone]",
+      params: { phone: data.phone },
+    });
   };
 
   return (
