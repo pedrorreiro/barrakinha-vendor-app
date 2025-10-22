@@ -16,6 +16,7 @@ export default function Layout() {
       <Stack.Screen name="welcome" />
       <Stack.Screen name="sign-in" />
       <Stack.Screen name="otp-code" />
+      <Stack.Screen name="register" />
     </Stack>
   );
 }

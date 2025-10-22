@@ -1,29 +1,27 @@
-import React, { useMemo, useState } from "react";
-import {
-  StyleSheet,
-  SafeAreaView,
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-} from "react-native";
-import FeatherIcon from "@expo/vector-icons/Feather";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import React, { useState } from "react";
+import { StyleSheet, View, Text, TextInput } from "react-native";
 import {
   formatPhoneNumber,
   cleanPhoneNumber,
   removeNonNumeric,
   isValidBrazilianPhone,
 } from "../utils/phone";
+import { FieldError } from "react-hook-form";
 
 type IProps = {
   showLabel?: boolean;
   onPhoneChange?: (phone: string, isValid: boolean) => void;
+  bordered?: boolean;
+  label?: string;
+  error?: FieldError;
 };
 
 export default function PhoneInput({
   showLabel = true,
   onPhoneChange,
+  bordered = true,
+  label,
+  error,
 }: IProps) {
   const [form, setForm] = useState({
     phone: "",
@@ -45,69 +43,53 @@ export default function PhoneInput({
   };
 
   return (
-    <View style={styles.content}>
-      <View style={styles.section}>
-        {showLabel && (
-          <Text style={styles.sectionTitle}>Número de telefone</Text>
-        )}
+    <View>
+      {label && <Text style={styles.sectionTitle}>{label}</Text>}
 
-        <View style={styles.sectionBody}>
-          <View style={styles.sectionPicker}>
-            <Text style={styles.sectionPickerText}>🇧🇷</Text>
-          </View>
-
-          <TextInput
-            clearButtonMode="while-editing"
-            keyboardType="phone-pad"
-            onChangeText={handlePhoneChange}
-            placeholder="(11) 99999-9999"
-            returnKeyType="done"
-            style={styles.sectionInput}
-            value={formatPhoneNumber(form.phone)}
-          />
+      <View
+        style={[
+          styles.sectionBody,
+          bordered && { borderWidth: 2, borderColor: "#e5e7eb" },
+          error && styles.errorBorder,
+        ]}
+      >
+        <View style={styles.sectionPicker}>
+          <Text style={styles.sectionPickerText}>🇧🇷</Text>
         </View>
+
+        <TextInput
+          clearButtonMode="while-editing"
+          keyboardType="phone-pad"
+          onChangeText={handlePhoneChange}
+          placeholder="(11) 99999-9999"
+          returnKeyType="done"
+          style={styles.sectionInput}
+          value={formatPhoneNumber(form.phone)}
+        />
       </View>
+
+      {error && <Text style={styles.errorText}>{error.message}</Text>}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  content: {},
-  /** Header */
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-    paddingHorizontal: 16,
+  errorBorder: {
+    borderColor: "rgba(248, 46, 8, 0.4)",
   },
-  headerAction: {
-    width: 40,
-    height: 40,
-    alignItems: "flex-start",
-    justifyContent: "center",
-  },
-  headerTitle: {
-    fontSize: 19,
-    fontWeight: "600",
-    color: "#000",
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
-    textAlign: "center",
+  errorText: {
+    fontSize: 13,
+    color: "#F82E08",
+    marginTop: 8,
+    marginBottom: 16,
+    marginLeft: 12,
   },
   /** Section */
-  section: {
-    paddingTop: 12,
-  },
   sectionTitle: {
-    margin: 8,
-    marginLeft: 12,
-    fontSize: 13,
-    letterSpacing: 0.33,
-    fontWeight: "500",
-    color: "#a69f9f",
-    textTransform: "uppercase",
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#222",
+    marginBottom: 6,
   },
   sectionBody: {
     flexDirection: "row",
@@ -128,7 +110,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#1d1d1d",
     lineHeight: 28,
-    marginRight: 6,
   },
   sectionInput: {
     width: "100%",

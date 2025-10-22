@@ -30,10 +30,9 @@ export default function SignIn() {
       <KeyboardAwareScrollView>
         <View style={styles.form}>
           <View style={styles.input}>
-            <Text style={styles.inputLabel}>Número de telefone</Text>
-
             <PhoneInput
-              showLabel={false}
+              showLabel={true}
+              bordered={false}
               onPhoneChange={(phone, isValid) =>
                 setForm({ ...form, phone, isValidPhone: isValid })
               }
@@ -44,7 +43,10 @@ export default function SignIn() {
             <Button
               title="Continuar"
               onPress={() => {
-                router.push("/otp-code");
+                router.push({
+                  pathname: "/otp-code/[phone]",
+                  params: { phone: form.phone },
+                });
               }}
               disabled={!form.isValidPhone}
             />

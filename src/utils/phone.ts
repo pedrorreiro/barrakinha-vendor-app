@@ -77,3 +77,23 @@ export const isValidBrazilianPhone = (phone: string): boolean => {
 export const removeNonNumeric = (text: string): string => {
   return text.replace(/\D/g, "");
 };
+
+export const getPhoneNumberWithoutCountryCode = (phone: string): string => {
+  const cleaned = phone.replace(/\D/g, "");
+  const withoutCountryCode = cleaned.startsWith("55")
+    ? cleaned.slice(2)
+    : cleaned;
+  return withoutCountryCode;
+};
+
+export const maskPhoneNumberForPublicDisplay = (phone: string): string => {
+  const withoutCountryCode = getPhoneNumberWithoutCountryCode(phone);
+  const formatted = formatPhoneNumber(withoutCountryCode);
+
+  // Mostra apenas os últimos 2 números
+  // exemplo: (12) 3456-7890 -> (**) ****-**90
+  const digits = withoutCountryCode.replace(/\D/g, "");
+  const lastTwoDigits = digits.slice(-2);
+
+  return formatted.replace(/\d/g, "*").slice(0, -2) + lastTwoDigits;
+};

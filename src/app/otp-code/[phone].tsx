@@ -1,13 +1,19 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { StyleSheet, SafeAreaView, View, Alert } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 import Button from "@/components/Button";
 import OtpInput from "@/components/OtpInput";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { maskPhoneNumberForPublicDisplay } from "@/utils/phone";
+
+type OtpCodeParams = {
+  phone: string;
+};
 
 export default function OtpCode() {
+  const { phone } = useLocalSearchParams<OtpCodeParams>();
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [code, setCode] = useState("");
@@ -15,6 +21,11 @@ export default function OtpCode() {
 
   const { login } = useAuth();
   const router = useRouter();
+
+  const maskedPhone = useMemo(
+    () => maskPhoneNumberForPublicDisplay(phone),
+    [phone]
+  );
 
   const handleVerifyCode = async () => {
     if (isLoading) return;
@@ -73,7 +84,7 @@ export default function OtpCode() {
     <SafeAreaView className="flex-1 bg-background">
       <Header
         title="Código de Verificação"
-        subtitle="Enviamos um código de verificação para o seu número de telefone. Digite o código para continuar."
+        subtitle={`Enviamos um código de verificação para o seu número de telefone ${maskedPhone}. Digite o código para continuar.`}
         showBackButton={true}
       />
 

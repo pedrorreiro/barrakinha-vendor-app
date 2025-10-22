@@ -32,7 +32,7 @@ export default function Welcome() {
           <View className="w-full mt-9 mb-auto">
             <TouchableOpacity
               onPress={() => {
-                // handle onPress
+                router.push("/register");
               }}
             >
               <View className="flex-row items-center justify-center rounded-lg py-4 px-6 border border-primary bg-primary">
