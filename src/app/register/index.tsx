@@ -9,6 +9,9 @@ import Button from "@/components/Button";
 import { registerSchema, RegisterFormData } from "@/schemas/register";
 import { useRouter } from "expo-router";
 import { Screens } from "../_layout";
+import barrakinhaService, {
+  OtpType,
+} from "@/services/barrakinha/barrakinha.service";
 export default function Register() {
   const router = useRouter();
   const {
@@ -26,15 +29,15 @@ export default function Register() {
     },
   });
 
-  const onSubmit = (data: RegisterFormData) => {
-    console.log("Formulário válido:", data);
-
-    // chama o endpoint de criar loja
-
-    router.push({
-      pathname: "/otp-code/[phone]",
-      params: { phone: data.phone, nextScreen: Screens.BUY_PLAN },
-    });
+  const onSubmit = async (data: RegisterFormData) => {
+    try {
+      await barrakinhaService.createStore(data);
+      await barrakinhaService.sendOtpCode(data.phone, OtpType.STORE_VALIDATION);
+      router.push({
+        pathname: "/otp-code/[phone]",
+        params: { phone: data.phone, otpType: OtpType.STORE_VALIDATION },
+      });
+    } catch (error) {}
   };
 
   return (

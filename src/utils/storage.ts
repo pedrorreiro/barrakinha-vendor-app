@@ -20,6 +20,7 @@ export const storage = {
 export const STORAGE_KEYS = {
   THEME: "theme",
   USER: "user",
+  JWT: "jwt",
 } as const;
 
 export const getStoredTheme = (): "light" | "dark" | null => {
@@ -39,6 +40,14 @@ export const setStoredUser = (user: string) => {
   storage.set(STORAGE_KEYS.USER, user);
 };
 
-export const removeStoredUser = () => {
-  storage.delete(STORAGE_KEYS.USER);
+export const getStoredJwt = (): string | null => {
+  return storage.getString(STORAGE_KEYS.JWT) || null;
+};
+
+export const setStoredJwt = (jwt: string) => {
+  storage.set(STORAGE_KEYS.JWT, jwt);
+};
+
+export const removeStoredJwt = () => {
+  storage.delete(STORAGE_KEYS.JWT);
 };

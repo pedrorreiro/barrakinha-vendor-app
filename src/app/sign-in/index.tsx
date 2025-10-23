@@ -13,12 +13,31 @@ import Button from "@/components/Button";
 import Header from "@/components/Header";
 import { useRouter } from "expo-router";
 import { Screens } from "../_layout";
+import barrakinhaService, {
+  OtpType,
+} from "@/services/barrakinha/barrakinha.service";
 export default function SignIn() {
   const [form, setForm] = useState({
     phone: "",
     isValidPhone: false,
   });
   const router = useRouter();
+
+  const handleSendOtpCode = async () => {
+    await barrakinhaService.sendOtpCode(
+      form.phone,
+      OtpType.STORE_AUTHENTICATION
+    );
+
+    const routeParams = {
+      pathname: `/otp-code/${form.phone}`,
+      params: {
+        otpType: OtpType.STORE_AUTHENTICATION.toString(),
+      },
+    };
+
+    router.push(routeParams);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -43,11 +62,8 @@ export default function SignIn() {
           <View style={styles.formAction}>
             <Button
               title="Continuar"
-              onPress={() => {
-                router.push({
-                  pathname: "/otp-code/[phone]",
-                  params: { phone: form.phone, nextScreen: Screens.WELCOME },
-                });
+              onPress={async () => {
+                await handleSendOtpCode();
               }}
               disabled={!form.isValidPhone}
             />

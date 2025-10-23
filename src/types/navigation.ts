@@ -1,11 +1,12 @@
 import { Screens } from "@/app/_layout";
+import { OtpType } from "@/services/barrakinha/barrakinha.service";
 
 export type RootStackParamList = {
   [Screens.WELCOME]: undefined;
   [Screens.SIGN_IN]: undefined;
   [Screens.OTP_CODE]: {
     phone: string;
-    nextScreen?: Screens;
+    otpType: string;
   };
   drawer: undefined;
 };

@@ -1,8 +1,5 @@
-import {
-  getStoredUser,
-  removeStoredUser,
-  setStoredUser,
-} from "@/utils/storage";
+import { barrakinhaService } from "@/services";
+import { getStoredUser, removeStoredJwt, setStoredJwt } from "@/utils/storage";
 import { useEffect, useState } from "react";
 
 export function useAuth() {
@@ -26,14 +23,13 @@ export function useAuth() {
     loadUser();
   }, []);
 
-  const login = async (userData: string) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setStoredUser(userData);
-    setUser(userData);
+  const login = async (code: string, phone: string) => {
+    const response = await barrakinhaService.login(code, phone);
+    setStoredJwt(response.jwt);
   };
 
   const logout = async () => {
-    removeStoredUser();
+    removeStoredJwt();
     setUser(null);
   };
 

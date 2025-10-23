@@ -7,14 +7,19 @@ import Button from "@/components/Button";
 import OtpInput from "@/components/OtpInput";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { maskPhoneNumberForPublicDisplay } from "@/utils/phone";
+import barrakinhaService, {
+  OtpType,
+} from "@/services/barrakinha/barrakinha.service";
+import { Screens } from "../_layout";
 
 type OtpCodeParams = {
   phone: string;
-  nextScreen?: string;
+  otpType: string;
 };
 
 export default function OtpCode() {
-  const { phone, nextScreen } = useLocalSearchParams<OtpCodeParams>();
+  const { phone, otpType } = useLocalSearchParams<OtpCodeParams>();
+
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [code, setCode] = useState("");
@@ -23,6 +28,13 @@ export default function OtpCode() {
   const { login } = useAuth();
   const router = useRouter();
 
+  const nextScreen = useMemo(() => {
+    return {
+      [OtpType.STORE_AUTHENTICATION]: Screens.BUY_PLAN,
+      [OtpType.STORE_VALIDATION]: Screens.WELCOME,
+    }[otpType as OtpType];
+  }, [otpType]);
+
   const maskedPhone = useMemo(
     () => maskPhoneNumberForPublicDisplay(phone),
     [phone]
@@ -30,28 +42,24 @@ export default function OtpCode() {
 
   const handleVerifyCode = async (code: string) => {
     if (isLoading) return;
+
     setIsLoading(true);
 
-    const codeToCheck = code;
-
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log({ code: codeToCheck });
-      if (codeToCheck === "123456") {
-        // await login("test-user");
-        const targetScreen = nextScreen;
-        router.replace(targetScreen);
-      } else {
-        Alert.alert("Erro", "Código inválido. Tente novamente.");
-        setCode("");
+      if (otpType === OtpType.STORE_AUTHENTICATION) {
+        await login(code, phone);
+        router.replace(nextScreen);
+      }
+
+      if (otpType === OtpType.STORE_VALIDATION) {
+        await barrakinhaService.validateStore(code, phone);
+        Alert.alert("Loja validada com sucesso");
+        router.replace(nextScreen);
       }
     } catch (error) {
-      Alert.alert(
-        "Erro",
-        "Ocorreu um erro ao verificar o código. Tente novamente."
-      );
     } finally {
       setIsLoading(false);
+      setCode("");
     }
   };
 
@@ -61,24 +69,9 @@ export default function OtpCode() {
     setIsResending(true);
     try {
       // Simular reenvio do código
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Iniciar cooldown de 60 segundos
-      setResendCooldown(60);
-      const interval = setInterval(() => {
-        setResendCooldown((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      Alert.alert("Sucesso", "Código reenviado com sucesso!");
+      await barrakinhaService.sendOtpCode(phone, otpType as OtpType);
       setCode("");
     } catch (error) {
-      Alert.alert("Erro", "Erro ao reenviar código. Tente novamente.");
     } finally {
       setIsResending(false);
     }
@@ -125,6 +118,7 @@ export default function OtpCode() {
     </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   /** Form */
   form: {

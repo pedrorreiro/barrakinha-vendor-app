@@ -87,6 +87,7 @@ export const getPhoneNumberWithoutCountryCode = (phone: string): string => {
 };
 
 export const maskPhoneNumberForPublicDisplay = (phone: string): string => {
+  if (!phone) return "";
   const withoutCountryCode = getPhoneNumberWithoutCountryCode(phone);
   const formatted = formatPhoneNumber(withoutCountryCode);
 
