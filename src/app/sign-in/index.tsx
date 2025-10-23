@@ -12,6 +12,7 @@ import PhoneInput from "@/components/PhoneInput";
 import Button from "@/components/Button";
 import Header from "@/components/Header";
 import { useRouter } from "expo-router";
+import { Screens } from "../_layout";
 export default function SignIn() {
   const [form, setForm] = useState({
     phone: "",
@@ -45,7 +46,7 @@ export default function SignIn() {
               onPress={() => {
                 router.push({
                   pathname: "/otp-code/[phone]",
-                  params: { phone: form.phone },
+                  params: { phone: form.phone, nextScreen: Screens.WELCOME },
                 });
               }}
               disabled={!form.isValidPhone}

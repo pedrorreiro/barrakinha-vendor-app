@@ -4,7 +4,7 @@ import { StyleSheet, View, Text, TextInput } from "react-native";
 interface OtpInputProps {
   value: string;
   onChangeText: (value: string) => void;
-  onFill?: () => void;
+  onFill: (value: string) => void;
   length?: number;
   autoFocus?: boolean;
 }
@@ -22,7 +22,7 @@ export default function OtpInput({
     onChangeText(numericText);
 
     if (numericText.length === length) {
-      onFill?.();
+      onFill(numericText);
     }
   };
 

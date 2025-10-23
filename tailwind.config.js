@@ -20,5 +20,22 @@ module.exports = {
   future: {
     hoverOnlyWhenSupported: true,
   },
-  plugins: [],
+  plugins: [
+    function({ addComponents }) {
+      addComponents({
+        '.feature': {
+          '@apply flex-row items-center justify-center mb-6': {},
+        },
+        '.feature-icon': {
+          '@apply w-12 h-12 rounded-lg bg-primary items-center justify-center mr-3': {},
+        },
+        '.feature-text': {
+          '@apply text-base leading-[22px] font-medium text-secondary flex-col flex-1 gap-2': {},
+        },
+        '.feature-title': {
+          '@apply font-bold text-foreground': {},
+        },
+      })
+    }
+  ],
 };

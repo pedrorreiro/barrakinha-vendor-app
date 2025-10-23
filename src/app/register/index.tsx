@@ -8,6 +8,7 @@ import CustomTextInput from "@/components/CustomTextInput";
 import Button from "@/components/Button";
 import { registerSchema, RegisterFormData } from "@/schemas/register";
 import { useRouter } from "expo-router";
+import { Screens } from "../_layout";
 export default function Register() {
   const router = useRouter();
   const {
@@ -32,12 +33,12 @@ export default function Register() {
 
     router.push({
       pathname: "/otp-code/[phone]",
-      params: { phone: data.phone },
+      params: { phone: data.phone, nextScreen: Screens.BUY_PLAN },
     });
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F4EFF3" }}>
+    <SafeAreaView className="flex-1 bg-background">
       <Header
         title="Cadastro"
         subtitle="Preencha os campos abaixo para criar sua conta."

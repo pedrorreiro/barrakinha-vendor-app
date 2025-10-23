@@ -10,10 +10,11 @@ import { maskPhoneNumberForPublicDisplay } from "@/utils/phone";
 
 type OtpCodeParams = {
   phone: string;
+  nextScreen?: string;
 };
 
 export default function OtpCode() {
-  const { phone } = useLocalSearchParams<OtpCodeParams>();
+  const { phone, nextScreen } = useLocalSearchParams<OtpCodeParams>();
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [code, setCode] = useState("");
@@ -27,16 +28,19 @@ export default function OtpCode() {
     [phone]
   );
 
-  const handleVerifyCode = async () => {
+  const handleVerifyCode = async (code: string) => {
     if (isLoading) return;
     setIsLoading(true);
 
+    const codeToCheck = code;
+
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      if (code === "123456") {
+      console.log({ code: codeToCheck });
+      if (codeToCheck === "123456") {
         // await login("test-user");
-        router.replace("welcome");
+        const targetScreen = nextScreen;
+        router.replace(targetScreen);
       } else {
         Alert.alert("Erro", "Código inválido. Tente novamente.");
         setCode("");
@@ -100,19 +104,13 @@ export default function OtpCode() {
             />
           </View>
 
-          <View style={styles.formAction}>
-            <Button
-              title={isLoading ? "Verificando..." : "Verificar Código"}
-              onPress={handleVerifyCode}
-              disabled={code.length !== 6 || isLoading}
-            />
-          </View>
-
           <View style={styles.resendContainer}>
             <Button
               variant="outline"
               title={
-                resendCooldown > 0
+                isLoading
+                  ? "Verificando..."
+                  : resendCooldown > 0
                   ? `Reenviar em ${resendCooldown}s`
                   : isResending
                   ? "Reenviando..."

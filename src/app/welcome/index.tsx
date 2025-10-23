@@ -1,3 +1,4 @@
+import Button from "@/components/Button";
 import { Link, useRouter } from "expo-router";
 import React from "react";
 import {
@@ -29,30 +30,32 @@ export default function Welcome() {
             Comece sua jornada conosco e descubra novas possibilidades.
           </Text>
 
-          <View className="w-full mt-9 mb-auto">
-            <TouchableOpacity
+          <View className="w-full mt-9 mb-auto gap-4">
+            <Button
+              title="Começar agora"
+              size="large"
               onPress={() => {
                 router.push("/register");
               }}
-            >
-              <View className="flex-row items-center justify-center rounded-lg py-4 px-6 border border-primary bg-primary">
-                <Text className="text-[17px] leading-[22px] font-bold text-white">
-                  Começar agora
-                </Text>
-              </View>
-            </TouchableOpacity>
+            />
 
-            <TouchableOpacity
+            <Button
+              title="Já tenho uma conta"
+              size="large"
               onPress={() => {
                 router.push("/sign-in");
               }}
-            >
-              <View className="flex-row items-center justify-center rounded-lg py-4 px-6 border-[1.5px] border-primary bg-transparent mt-3">
-                <Text className="text-[17px] leading-[22px] font-bold text-primary">
-                  Já tenho uma conta
-                </Text>
-              </View>
-            </TouchableOpacity>
+              variant="outline"
+            />
+
+            <Button
+              title="Tela de planos"
+              size="large"
+              onPress={() => {
+                router.push("/buy-plan");
+              }}
+              variant="outline"
+            />
           </View>
 
           <TouchableOpacity

@@ -1,8 +1,11 @@
+import { Screens } from "@/app/_layout";
+
 export type RootStackParamList = {
-  welcome: undefined;
-  "sign-in": undefined;
-  "otp-code/[phone]": {
+  [Screens.WELCOME]: undefined;
+  [Screens.SIGN_IN]: undefined;
+  [Screens.OTP_CODE]: {
     phone: string;
+    nextScreen?: Screens;
   };
   drawer: undefined;
 };
