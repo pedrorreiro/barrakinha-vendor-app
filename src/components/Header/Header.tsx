@@ -1,4 +1,3 @@
-import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import FeatherIcon from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
@@ -25,7 +24,7 @@ export default function Header({
   };
 
   return (
-    <View className="px-6 mb-7">
+    <View className="px-6 mb-7 mt-4">
       {showBackButton && (
         <TouchableOpacity
           onPress={handleBackPress}

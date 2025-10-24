@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { StyleSheet, View, Text, TextInput } from "react-native";
 import {
   formatPhoneNumber,
@@ -9,7 +9,6 @@ import {
 import { FieldError } from "react-hook-form";
 
 type IProps = {
-  showLabel?: boolean;
   onPhoneChange?: (phone: string, isValid: boolean) => void;
   bordered?: boolean;
   label?: string;
@@ -17,7 +16,6 @@ type IProps = {
 };
 
 export default function PhoneInput({
-  showLabel = true,
   onPhoneChange,
   bordered = true,
   label,
@@ -28,8 +26,15 @@ export default function PhoneInput({
   });
 
   const handlePhoneChange = (text: string) => {
-    const cleaned = removeNonNumeric(text);
+    // Remove todos os caracteres não numéricos quando cola um número com +55
+    let cleaned = removeNonNumeric(text);
 
+    // Isso resolve o problema do autocomplete que sugere +55
+    if (cleaned.startsWith("55") && cleaned.length > 11) {
+      cleaned = cleaned.slice(2);
+    }
+
+    // Limita a 11 dígitos (DDD + 9 dígitos do celular)
     if (cleaned.length <= 11) {
       setForm({ ...form, phone: cleaned });
 
@@ -44,7 +49,11 @@ export default function PhoneInput({
 
   return (
     <View>
-      {label && <Text style={styles.sectionTitle}>{label}</Text>}
+      {label && (
+        <Text className="text-secondary" style={styles.sectionTitle}>
+          {label}
+        </Text>
+      )}
 
       <View
         style={[
@@ -54,17 +63,22 @@ export default function PhoneInput({
         ]}
       >
         <View style={styles.sectionPicker}>
-          <Text style={styles.sectionPickerText}>🇧🇷</Text>
+          <Text className="text-lg">🇧🇷</Text>
         </View>
 
         <TextInput
+          autoComplete="tel"
           clearButtonMode="while-editing"
           keyboardType="phone-pad"
           onChangeText={handlePhoneChange}
           placeholder="(11) 99999-9999"
+          placeholderTextColor={"#889797"}
           returnKeyType="done"
           style={styles.sectionInput}
           value={formatPhoneNumber(form.phone)}
+          textContentType="telephoneNumber"
+          autoCorrect={false}
+          spellCheck={false}
         />
       </View>
 
@@ -84,11 +98,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginLeft: 12,
   },
-  /** Section */
   sectionTitle: {
-    fontSize: 15,
     fontWeight: "600",
-    color: "#222",
     marginBottom: 6,
   },
   sectionBody: {
@@ -99,46 +110,18 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   sectionPicker: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     borderRightWidth: 1,
     borderColor: "#ebebeb",
     flexDirection: "row",
     alignItems: "center",
   },
-  sectionPickerText: {
-    fontSize: 17,
-    fontWeight: "500",
-    color: "#1d1d1d",
-    lineHeight: 28,
-  },
   sectionInput: {
-    width: "100%",
+    flex: 1,
     paddingHorizontal: 16,
-    height: 44,
-    fontSize: 17,
     fontWeight: "500",
-    color: "#1d1d1d",
-  },
-  /** Button */
-  btn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderWidth: 1,
-    backgroundColor: "#000",
-    borderColor: "#000",
-    marginVertical: 24,
-    marginHorizontal: 36,
-  },
-  btnText: {
-    fontSize: 18,
-    lineHeight: 26,
-    fontWeight: "600",
-    color: "#fff",
-    marginRight: "auto",
-    marginLeft: "auto",
+    textAlignVertical: "center",
+    fontSize: 16,
+    lineHeight: 20,
   },
 });

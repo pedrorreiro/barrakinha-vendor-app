@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { StyleSheet, SafeAreaView, View, Alert } from "react-native";
+import { useMemo, useState } from "react";
+import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/Header";
@@ -10,7 +10,9 @@ import { maskPhoneNumberForPublicDisplay } from "@/utils/phone";
 import barrakinhaService, {
   OtpType,
 } from "@/services/barrakinha/barrakinha.service";
-import { Screens } from "../_layout";
+import { Screens } from "@/enums";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Toast } from "toastify-react-native";
 
 type OtpCodeParams = {
   phone: string;
@@ -21,16 +23,15 @@ export default function OtpCode() {
   const { phone, otpType } = useLocalSearchParams<OtpCodeParams>();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isResending, setIsResending] = useState(false);
   const [code, setCode] = useState("");
-  const [resendCooldown, setResendCooldown] = useState(0);
+  const [failedCode, setFailedCode] = useState<string>("");
 
   const { login } = useAuth();
   const router = useRouter();
 
   const nextScreen = useMemo(() => {
     return {
-      [OtpType.STORE_AUTHENTICATION]: Screens.BUY_PLAN,
+      [OtpType.STORE_AUTHENTICATION]: Screens.HOME,
       [OtpType.STORE_VALIDATION]: Screens.WELCOME,
     }[otpType as OtpType];
   }, [otpType]);
@@ -47,16 +48,22 @@ export default function OtpCode() {
 
     try {
       if (otpType === OtpType.STORE_AUTHENTICATION) {
-        await login(code, phone);
+        const loginResult = await login(code, phone);
+        if (loginResult.isWrong()) return;
+
         router.replace(nextScreen);
       }
 
       if (otpType === OtpType.STORE_VALIDATION) {
-        await barrakinhaService.validateStore(code, phone);
-        Alert.alert("Loja validada com sucesso");
+        const result = await barrakinhaService.validateStore(code, phone);
+        if (result.isWrong()) return;
+
+        Toast.success("Loja validada com sucesso");
         router.replace(nextScreen);
       }
     } catch (error) {
+      // Em caso de erro, armazena o código que falhou
+      setFailedCode(code);
     } finally {
       setIsLoading(false);
       setCode("");
@@ -64,53 +71,43 @@ export default function OtpCode() {
   };
 
   const handleResendCode = async () => {
-    if (resendCooldown > 0) return;
+    const result = await barrakinhaService.sendOtpCode(
+      phone,
+      otpType as OtpType
+    );
 
-    setIsResending(true);
-    try {
-      // Simular reenvio do código
-      await barrakinhaService.sendOtpCode(phone, otpType as OtpType);
-      setCode("");
-    } catch (error) {
-    } finally {
-      setIsResending(false);
-    }
+    if (result.isWrong()) return;
+
+    setCode("");
+    Toast.success("Código reenviado!");
   };
 
   return (
     <SafeAreaView className="flex-1 bg-background">
       <Header
-        title="Código de Verificação"
+        title="Confirmar código"
         subtitle={`Enviamos um código de verificação para o seu número de telefone ${maskedPhone}. Digite o código para continuar.`}
         showBackButton={true}
       />
 
-      <KeyboardAwareScrollView>
-        <View style={styles.form}>
-          <View style={styles.inputContainer}>
+      <KeyboardAwareScrollView className="flex-1">
+        <View className="flex-1 px-6">
+          <View className="mb-6">
             <OtpInput
               value={code}
               onChangeText={setCode}
               onFill={handleVerifyCode}
               length={6}
               autoFocus={true}
+              failedCode={failedCode}
             />
           </View>
 
-          <View style={styles.resendContainer}>
+          <View className="mb-6">
             <Button
               variant="outline"
-              title={
-                isLoading
-                  ? "Verificando..."
-                  : resendCooldown > 0
-                  ? `Reenviar em ${resendCooldown}s`
-                  : isResending
-                  ? "Reenviando..."
-                  : "Reenviar código"
-              }
+              title="Reenviar código"
               onPress={handleResendCode}
-              disabled={isResending || resendCooldown > 0}
             />
           </View>
         </View>
@@ -118,22 +115,3 @@ export default function OtpCode() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  /** Form */
-  form: {
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
-    paddingHorizontal: 24,
-  },
-  inputContainer: {
-    marginBottom: 24,
-  },
-  formAction: {
-    marginBottom: 16,
-  },
-  resendContainer: {
-    marginBottom: 24,
-  },
-});

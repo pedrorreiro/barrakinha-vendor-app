@@ -1,14 +1,39 @@
-import { StyleSheet, SafeAreaView, View, Text } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import FeatherIcon from "@expo/vector-icons/Feather";
 import Button from "@/components/Button";
 import { useRouter } from "expo-router";
 import Header from "@/components/Header";
+import { Screens } from "@/enums";
 
-export default function BuyPlan() {
+const features = [
+  {
+    id: 1,
+    icon: "dollar-sign",
+    title: "Zero mensalidade.",
+    description: "Pague apenas quando vender. Sem taxas fixas, sem surpresas.",
+  },
+  {
+    id: 2,
+    icon: "map-pin",
+    title: "Venda de qualquer lugar.",
+    description:
+      "Seus clientes te encontram facilmente com nossa geolocalização inteligente.",
+  },
+  {
+    id: 3,
+    icon: "settings",
+    title: "Gestão completa do seu negócio.",
+    description:
+      "Organize vendas, clientes e produtos em uma plataforma intuitiva.",
+  },
+];
+
+export default function ServiceDetails() {
   const router = useRouter();
 
   return (
-    <SafeAreaView className="flex-1 bg-background mt-4" >
+    <SafeAreaView className="flex-1 bg-background">
       <Header
         title="Comece a vender hoje mesmo"
         subtitle="Ganhe visibilidade em toda a região com nosso sistema."
@@ -17,55 +42,36 @@ export default function BuyPlan() {
 
       <View className="p-2 pt-8 flex-grow flex-shrink flex-basis-0">
         <View className="flex-col items-start pt-4 px-4 flex-grow flex-shrink flex-basis-0">
-          <View className="feature">
-            <View className="feature-icon">
-              <FeatherIcon color="#fff" name="dollar-sign" size={24} />
-            </View>
+          {features.map((feature) => (
+            <View
+              key={feature.id}
+              className="flex-row items-center justify-center mb-6"
+            >
+              <View className="w-12 h-12 rounded-lg bg-primary items-center justify-center mr-3">
+                <FeatherIcon
+                  color="#fff"
+                  name={feature.icon as any}
+                  size={24}
+                />
+              </View>
 
-            <View className="feature-text">
-              <Text className="text-secondary">
-                <Text className="feature-title">Zero mensalidade. </Text>
-                Pague apenas quando vender. Sem taxas fixas, sem surpresas.
-              </Text>
+              <View className="text-base leading-[22px] font-medium text-secondary flex-col flex-1 gap-2">
+                <Text className="text-secondary">
+                  <Text className="font-bold text-foreground">
+                    {feature.title}
+                  </Text>
+                </Text>
+                <Text className="text-secondary">{feature.description}</Text>
+              </View>
             </View>
-          </View>
-
-          <View className="feature">
-            <View className="feature-icon">
-              <FeatherIcon color="#fff" name="map-pin" size={24} />
-            </View>
-
-            <View className="feature-text">
-              <Text className="text-secondary">
-                <Text className="feature-title">Venda de qualquer lugar.</Text>{" "}
-                Seus clientes te encontram facilmente com nossa geolocalização
-                inteligente.
-              </Text>
-            </View>
-          </View>
-
-          <View className="feature">
-            <View className="feature-icon">
-              <FeatherIcon color="#fff" name="settings" size={24} />
-            </View>
-
-            <View className="feature-text">
-              <Text className="text-secondary">
-                <Text className="feature-title">
-                  Gestão completa do seu negócio.
-                </Text>{" "}
-                Organize vendas, clientes e produtos em uma plataforma
-                intuitiva.
-              </Text>
-            </View>
-          </View>
+          ))}
 
           <View style={styles.paywallFooter}>
             <Button
               size="large"
               title="Começar a vender"
               onPress={() => {
-                router.replace("/register");
+                router.push(Screens.REGISTER);
               }}
             />
           </View>

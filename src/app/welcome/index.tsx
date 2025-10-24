@@ -1,12 +1,8 @@
 import Button from "@/components/Button";
+import { Screens } from "@/enums";
 import { useRouter } from "expo-router";
-import {
-  SafeAreaView,
-  View,
-  Image,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { View, Image, Text, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Welcome() {
   const router = useRouter();
@@ -22,7 +18,7 @@ export default function Welcome() {
 
         <View className="mt-auto flex-grow flex-shrink flex-basis-0 justify-end items-center">
           <Text className="text-[34px] font-bold text-foreground mb-3 text-center">
-            Bem-vindo!
+            Seja bem-vindo!
           </Text>
 
           <Text className="text-[15px] leading-5 font-medium text-secondary text-center">
@@ -34,7 +30,7 @@ export default function Welcome() {
               title="Começar agora"
               size="large"
               onPress={() => {
-                router.push("/register");
+                router.push(Screens.SERVICE_DETAILS);
               }}
             />
 
@@ -46,23 +42,13 @@ export default function Welcome() {
               }}
               variant="outline"
             />
-
-            <Button
-              title="Tela de planos"
-              size="large"
-              onPress={() => {
-                router.push("/buy-plan");
-              }}
-              variant="outline"
-            />
           </View>
 
           <TouchableOpacity
             onPress={() => {
               // handle onPress
             }}
-          >
-          </TouchableOpacity>
+          ></TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>

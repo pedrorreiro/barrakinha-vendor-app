@@ -1,11 +1,6 @@
 import { useState } from "react";
-import {
-  StyleSheet,
-  SafeAreaView,
-  View,
-  TouchableOpacity,
-  Text,
-} from "react-native";
+import { View, TouchableOpacity, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import PhoneInput from "@/components/PhoneInput";
 import Button from "@/components/Button";
@@ -14,6 +9,8 @@ import { useRouter } from "expo-router";
 import barrakinhaService, {
   OtpType,
 } from "@/services/barrakinha/barrakinha.service";
+import { Screens } from "@/enums";
+
 export default function SignIn() {
   const [form, setForm] = useState({
     phone: "",
@@ -22,10 +19,12 @@ export default function SignIn() {
   const router = useRouter();
 
   const handleSendOtpCode = async () => {
-    await barrakinhaService.sendOtpCode(
+    const result = await barrakinhaService.sendOtpCode(
       form.phone,
       OtpType.STORE_AUTHENTICATION
     );
+
+    if (result.isWrong()) return;
 
     const routeParams = {
       pathname: `/otp-code/${form.phone}`,
@@ -38,18 +37,17 @@ export default function SignIn() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background mt-4">
+    <SafeAreaView className="flex-1 bg-background">
       <Header
         title="Entrar"
         subtitle="Digite seu número de telefone para receber um código de verificação."
         showBackButton={true}
       />
 
-      <KeyboardAwareScrollView>
-        <View style={styles.form}>
-          <View style={styles.input}>
+      <KeyboardAwareScrollView className="flex-1">
+        <View className="flex-1 px-6">
+          <View className="mb-4">
             <PhoneInput
-              showLabel={true}
               bordered={false}
               onPhoneChange={(phone, isValid) =>
                 setForm({ ...form, phone, isValidPhone: isValid })
@@ -57,77 +55,29 @@ export default function SignIn() {
             />
           </View>
 
-          <View style={styles.formAction}>
+          <View className="my-6">
             <Button
               title="Continuar"
-              onPress={async () => {
-                await handleSendOtpCode();
-              }}
+              onPress={handleSendOtpCode}
               disabled={!form.isValidPhone}
             />
           </View>
         </View>
       </KeyboardAwareScrollView>
 
-      <TouchableOpacity
-        onPress={() => {
-          router.replace("/register");
-        }}
-      >
-        <Text style={styles.formFooter}>
-          Não tem uma conta? <Text style={styles.formLink}>Cadastre-se</Text>
-        </Text>
-      </TouchableOpacity>
+      <View className="mt-auto pb-6 px-6">
+        <TouchableOpacity
+          onPress={() => router.push(Screens.REGISTER)}
+          className="items-center"
+        >
+          <Text className="text-secondary text-base leading-5 text-center">
+            Não tem uma conta?{" "}
+            <Text className="text-right font-semibold underline">
+              Cadastre-se
+            </Text>
+          </Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  /** Form */
-  form: {
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
-    paddingHorizontal: 24,
-  },
-  formAction: {
-    marginVertical: 24,
-  },
-  formFooter: {
-    marginTop: "auto",
-    marginBottom: 24,
-    paddingHorizontal: 24,
-    fontSize: 15,
-    lineHeight: 20,
-    fontWeight: "400",
-    color: "var(--color-muted)",
-    textAlign: "center",
-  },
-  formLink: {
-    textAlign: "right",
-    fontWeight: "600",
-    color: "var(--color-primary)",
-    textDecorationLine: "underline",
-    textDecorationColor: "var(--color-primary)",
-    textDecorationStyle: "solid",
-  },
-  /** Input */
-  input: {
-    marginBottom: 16,
-  },
-  inputLabel: {
-    fontSize: 15,
-    fontWeight: "bold",
-    color: "var(--color-foreground)",
-    marginBottom: 6,
-  },
-  inputControl: {
-    height: 44,
-    backgroundColor: "#fff",
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    fontSize: 15,
-    fontWeight: "500",
-    color: "var(--color-foreground)",
-  },
-});

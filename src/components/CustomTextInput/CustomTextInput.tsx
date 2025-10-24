@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import {
   View,
   TextInput,
@@ -39,7 +39,11 @@ export default function CustomTextInput({
 
   return (
     <>
-      {label && <Text style={[styles.label, labelStyle]}>{label}</Text>}
+      {label && (
+        <Text className="text-secondary" style={[styles.label, labelStyle]}>
+          {label}
+        </Text>
+      )}
 
       <View
         style={[
@@ -57,6 +61,7 @@ export default function CustomTextInput({
         <TextInput
           maxLength={maxLength}
           style={[styles.input, inputStyle]}
+          placeholderTextColor={"#889797"}
           {...textInputProps}
         />
       </View>
@@ -68,9 +73,7 @@ export default function CustomTextInput({
 
 const styles = StyleSheet.create({
   label: {
-    fontSize: 15,
     fontWeight: "600",
-    color: "#222",
     marginBottom: 6,
   },
   errorBorder: {
@@ -95,7 +98,7 @@ const styles = StyleSheet.create({
     paddingRight: 16,
     paddingLeft: 0,
     marginLeft: 12,
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "500",
     paddingVertical: 12,
   },

@@ -1,7 +1,13 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { CreateStoreRequest, CreateStoreResponse } from "@/types/store";
-import { LoginResponse } from "./barrakinha.service.type";
-import { Alert } from "react-native";
+import {
+  GetStoreMeResponse,
+  LoginResponse,
+  RefreshTokenResponse,
+} from "./barrakinha.service.type";
+import { Toast } from "toastify-react-native";
+import { Either, right, wrong } from "@/utils/either";
+import { storage, StorageKeys } from "@/utils/storage";
 
 export enum OtpType {
   STORE_VALIDATION = "STORE_VALIDATION",
@@ -13,7 +19,8 @@ class BarrakinhaService {
 
   constructor() {
     this.api = axios.create({
-      baseURL: "http://localhost:3000",
+      baseURL:
+        "https://resistant-conservative-especially-vary.trycloudflare.com",
       timeout: 10000,
       headers: {
         "Content-Type": "application/json",
@@ -22,14 +29,17 @@ class BarrakinhaService {
 
     // Interceptor para logs de requisições (opcional)
     this.api.interceptors.request.use(
-      (config) => {
+      async (config) => {
+        const accessToken = await storage.get<string>(StorageKeys.ACCESS_TOKEN);
+        if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
+
         console.log(
           `[BarrakinhaService] ${config.method?.toUpperCase()} ${config.url}`
         );
         return config;
       },
       (error) => {
-        console.error("[BarrakinhaService] Request error:", error);
+        console.log("[BarrakinhaService] Request error:", error);
         return Promise.reject(error);
       }
     );
@@ -42,9 +52,14 @@ class BarrakinhaService {
       (error) => {
         const errorMessage = error.response?.data.message || error.message;
 
-        if (errorMessage) Alert.alert(errorMessage);
+        if (errorMessage)
+          Toast.show({
+            text1: "Oops! 😅 ",
+            text2: errorMessage,
+            type: "error",
+          });
         else {
-          console.error(
+          console.log(
             "[BarrakinhaService] Response error:",
             error.response?.data || error.message
           );
@@ -53,6 +68,17 @@ class BarrakinhaService {
         return Promise.reject(error);
       }
     );
+  }
+
+  async getStoreMe(): Promise<Either<Error, GetStoreMeResponse>> {
+    try {
+      const response: AxiosResponse<GetStoreMeResponse> = await this.api.get(
+        "/store/me"
+      );
+      return right(response.data);
+    } catch (error) {
+      return wrong(error);
+    }
   }
 
   async createStore(
@@ -69,31 +95,56 @@ class BarrakinhaService {
     }
   }
 
-  async sendOtpCode(phone: string, type: OtpType): Promise<void> {
+  async sendOtpCode(
+    phone: string,
+    type: OtpType
+  ): Promise<Either<void, Error>> {
     try {
       await this.api.post("/send-otp", { phone, type });
+      return right(undefined);
     } catch (error) {
-      throw error;
+      return wrong(error);
     }
   }
 
-  async login(code: string, phone: string): Promise<LoginResponse> {
+  async login(
+    code: string,
+    phone: string
+  ): Promise<Either<Error, LoginResponse>> {
     try {
       const response: AxiosResponse<LoginResponse> = await this.api.post(
         `/store/login`,
         { otpCode: code, phone }
       );
-      return response.data;
+      return right(response.data);
     } catch (error) {
-      throw error;
+      return wrong(error);
     }
   }
 
-  async validateStore(code: string, phone: string): Promise<void> {
+  async refreshToken(
+    refreshToken: string
+  ): Promise<Either<Error, RefreshTokenResponse>> {
+    try {
+      const response: AxiosResponse<RefreshTokenResponse> = await this.api.post(
+        `/auth/refresh-token`,
+        { refreshToken }
+      );
+      return right(response.data);
+    } catch (error) {
+      return wrong(error);
+    }
+  }
+
+  async validateStore(
+    code: string,
+    phone: string
+  ): Promise<Either<void, Error>> {
     try {
       await this.api.post("/store/validate", { otpCode: code, phone });
+      return right(undefined);
     } catch (error) {
-      throw error;
+      return wrong(error);
     }
   }
 }

@@ -1,4 +1,4 @@
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +11,8 @@ import { useRouter } from "expo-router";
 import barrakinhaService, {
   OtpType,
 } from "@/services/barrakinha/barrakinha.service";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 export default function Register() {
   const router = useRouter();
   const {
@@ -40,83 +42,86 @@ export default function Register() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background mt-4">
+    <SafeAreaView className="flex-1 bg-background">
       <Header
         title="Cadastro"
-        subtitle="Preencha os campos abaixo para criar sua conta."
+        subtitle="Preencha os campos abaixo para cadastrar sua Barrakinha."
         showBackButton={true}
       />
 
-      <KeyboardAwareScrollView style={styles.form}>
-        <Controller
-          control={control}
-          name="name"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <CustomTextInput
-              label="Nome Fantasia"
-              iconName="at"
-              autoCapitalize="none"
-              autoComplete="name"
-              clearButtonMode="while-editing"
-              onChangeText={onChange}
-              onBlur={onBlur}
-              placeholder="Espetinhos do João"
-              value={value}
-              error={errors.name}
-            />
-          )}
-        />
+      <KeyboardAwareScrollView className="flex-1 px-6">
+        <View className="space-y-4">
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <CustomTextInput
+                label="Nome Fantasia"
+                iconName="at"
+                autoCapitalize="none"
+                autoComplete="name"
+                clearButtonMode="while-editing"
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="Espetinhos do João"
+                value={value}
+                error={errors.name}
+              />
+            )}
+          />
 
-        <Controller
-          control={control}
-          name="ownerName"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <CustomTextInput
-              label="Responsável"
-              iconName="person"
-              clearButtonMode="while-editing"
-              onChangeText={onChange}
-              onBlur={onBlur}
-              placeholder="João da Silva"
-              value={value}
-              error={errors.ownerName}
-            />
-          )}
-        />
+          <Controller
+            control={control}
+            name="ownerName"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <CustomTextInput
+                label="Responsável"
+                iconName="person"
+                clearButtonMode="while-editing"
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="João da Silva"
+                value={value}
+                error={errors.ownerName}
+              />
+            )}
+          />
 
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <CustomTextInput
-              label="E-mail"
-              iconName="mail"
-              autoCapitalize="none"
-              autoCorrect={false}
-              clearButtonMode="while-editing"
-              keyboardType="email-address"
-              onChangeText={onChange}
-              onBlur={onBlur}
-              placeholder="joao@gmail.com"
-              value={value}
-              error={errors.email}
-            />
-          )}
-        />
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <CustomTextInput
+                autoComplete="email"
+                label="E-mail"
+                iconName="mail"
+                autoCapitalize="none"
+                autoCorrect={false}
+                clearButtonMode="while-editing"
+                keyboardType="email-address"
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="joao@gmail.com"
+                value={value}
+                error={errors.email}
+              />
+            )}
+          />
 
-        <Controller
-          control={control}
-          name="phone"
-          render={({ field: { onChange } }) => (
-            <PhoneInput
-              label="Número de telefone"
-              onPhoneChange={onChange}
-              error={errors.phone}
-            />
-          )}
-        />
+          <Controller
+            control={control}
+            name="phone"
+            render={({ field: { onChange } }) => (
+              <PhoneInput
+                label="Número de telefone"
+                onPhoneChange={onChange}
+                error={errors.phone}
+              />
+            )}
+          />
+        </View>
 
-        <View style={styles.formAction}>
+        <View className="my-6">
           <Button
             title="Continuar"
             size="large"
@@ -125,91 +130,30 @@ export default function Register() {
           />
         </View>
 
-        <Text className="text-[15px] leading-[22px] font-normal text-muted text-center">
-          Ao continuar, você concorda com nossos
-          {"\n "}
-          <Text className="text-accent font-semibold underline decoration-black decoration-solid">
+        <Text className="text-sm leading-5 font-normal text-muted text-center mb-4">
+          Ao continuar, você concorda com nossos{"\n"}
+          <Text className="text-accent font-semibold underline">
             Termos e Condições
           </Text>{" "}
           e{" "}
-          <Text className="text-accent font-semibold underline decoration-black decoration-solid">
+          <Text className="text-accent font-semibold underline">
             Política de Privacidade
           </Text>
           .
         </Text>
 
         <TouchableOpacity
-          className="mt-4"
-          onPress={() => {
-            router.replace("/sign-in");
-          }}
+          className="mb-6"
+          onPress={() => router.replace("/sign-in")}
         >
-          <Text className="text-[15px] leading-[22px] font-normal text-muted text-center">
-            Já tem uma conta? <Text className="text-accent font-semibold underline decoration-black decoration-solid">Entre</Text>
+          <Text className="text-sm leading-5 font-normal text-muted text-center">
+            Já tem uma conta?{" "}
+            <Text className="text-accent font-semibold underline">
+              Entre agora
+            </Text>
           </Text>
         </TouchableOpacity>
       </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  form: {
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
-    paddingHorizontal: 24,
-  },
-  formLabel: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#222",
-    marginBottom: 6,
-  },
-  formAction: {
-    marginVertical: 24,
-  },
-  formFooter: {
-    marginTop: "auto",
-    marginBottom: 24,
-    paddingHorizontal: 24,
-    fontSize: 15,
-    lineHeight: 20,
-    fontWeight: "400",
-    color: "#9fa5af",
-    textAlign: "center",
-  },
-  errorText: {
-    fontSize: 13,
-    color: "#F82E08",
-    marginTop: -12,
-    marginBottom: 16,
-    marginLeft: 4,
-  },
-  /** Button */
-  btn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 8,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderWidth: 1,
-    backgroundColor: "#F82E08",
-    borderColor: "#F82E08",
-  },
-  btnText: {
-    fontSize: 17,
-    lineHeight: 22,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  formLink: {
-    textAlign: "right",
-    fontWeight: "600",
-    color: "var(--color-primary)",
-    textDecorationLine: "underline",
-    textDecorationColor: "var(--color-primary)",
-    textDecorationStyle: "solid",
-  },
-});

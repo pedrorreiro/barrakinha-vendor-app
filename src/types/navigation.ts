@@ -1,5 +1,4 @@
-import { Screens } from "@/app/_layout";
-import { OtpType } from "@/services/barrakinha/barrakinha.service";
+import { Screens } from "@/enums";
 
 export type RootStackParamList = {
   [Screens.WELCOME]: undefined;
@@ -8,7 +7,8 @@ export type RootStackParamList = {
     phone: string;
     otpType: string;
   };
-  drawer: undefined;
+  [Screens.REGISTER]: undefined;
+  [Screens.SERVICE_DETAILS]: undefined;
 };
 
 // Para usar com router.push tipado

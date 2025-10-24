@@ -1,53 +1,37 @@
-// Mock do storage para testes
-// Para usar o storage real, descomente as linhas abaixo:
+import {
+  getStorageString,
+  setStorageString,
+  deleteStorageKey,
+} from "./secureStorage";
 
-// import { MMKV } from "react-native-mmkv";
-// export const storage = new MMKV();
+export enum StorageKeys {
+  THEME = "theme",
+  USER = "user",
+  REFRESH_TOKEN = "refresh_token",
+  ACCESS_TOKEN = "access_token",
+}
 
-// Mock do storage
-const mockStorage: Record<string, string> = {};
-
+// API unificada e simples para storage
 export const storage = {
-  getString: (key: string) => mockStorage[key] || null,
-  set: (key: string, value: string) => {
-    mockStorage[key] = value;
+  // Obter valor
+  get: async <T = string>(key: StorageKeys): Promise<T | null> => {
+    const value = await getStorageString(key);
+    return value as T | null;
   },
-  delete: (key: string) => {
-    delete mockStorage[key];
+
+  // Salvar valor
+  set: async <T = string>(key: StorageKeys, value: T): Promise<void> => {
+    await setStorageString(key, String(value));
   },
-};
 
-export const STORAGE_KEYS = {
-  THEME: "theme",
-  USER: "user",
-  JWT: "jwt",
-} as const;
+  // Deletar valor
+  delete: async (key: StorageKeys): Promise<void> => {
+    await deleteStorageKey(key);
+  },
 
-export const getStoredTheme = (): "light" | "dark" | null => {
-  const theme = storage.getString(STORAGE_KEYS.THEME);
-  return theme === "light" || theme === "dark" ? theme : null;
-};
-
-export const setStoredTheme = (theme: "light" | "dark") => {
-  storage.set(STORAGE_KEYS.THEME, theme);
-};
-
-export const getStoredUser = (): string | null => {
-  return storage.getString(STORAGE_KEYS.USER) || null;
-};
-
-export const setStoredUser = (user: string) => {
-  storage.set(STORAGE_KEYS.USER, user);
-};
-
-export const getStoredJwt = (): string | null => {
-  return storage.getString(STORAGE_KEYS.JWT) || null;
-};
-
-export const setStoredJwt = (jwt: string) => {
-  storage.set(STORAGE_KEYS.JWT, jwt);
-};
-
-export const removeStoredJwt = () => {
-  storage.delete(STORAGE_KEYS.JWT);
+  // Verificar se existe
+  has: async (key: StorageKeys): Promise<boolean> => {
+    const value = await getStorageString(key);
+    return value !== null;
+  },
 };
