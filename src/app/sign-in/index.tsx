@@ -1,18 +1,16 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   StyleSheet,
   SafeAreaView,
   View,
   TouchableOpacity,
   Text,
-  TextInput,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import PhoneInput from "@/components/PhoneInput";
 import Button from "@/components/Button";
 import Header from "@/components/Header";
 import { useRouter } from "expo-router";
-import { Screens } from "../_layout";
 import barrakinhaService, {
   OtpType,
 } from "@/services/barrakinha/barrakinha.service";
@@ -40,7 +38,7 @@ export default function SignIn() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background mt-4">
       <Header
         title="Entrar"
         subtitle="Digite seu número de telefone para receber um código de verificação."
@@ -73,7 +71,7 @@ export default function SignIn() {
 
       <TouchableOpacity
         onPress={() => {
-          // handle onPress
+          router.replace("/register");
         }}
       >
         <Text style={styles.formFooter}>

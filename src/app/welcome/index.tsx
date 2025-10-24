@@ -1,6 +1,5 @@
 import Button from "@/components/Button";
-import { Link, useRouter } from "expo-router";
-import React from "react";
+import { useRouter } from "expo-router";
 import {
   SafeAreaView,
   View,
@@ -63,18 +62,6 @@ export default function Welcome() {
               // handle onPress
             }}
           >
-            <Text className="text-[15px] leading-[22px] font-normal text-muted text-center">
-              Ao continuar, você concorda com nossos
-              {"\n "}
-              <Text className="text-accent font-semibold underline decoration-black decoration-solid">
-                Termos e Condições
-              </Text>{" "}
-              e{" "}
-              <Text className="text-accent font-semibold underline decoration-black decoration-solid">
-                Política de Privacidade
-              </Text>
-              .
-            </Text>
           </TouchableOpacity>
         </View>
       </View>

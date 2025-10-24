@@ -1,4 +1,4 @@
-import { StyleSheet, SafeAreaView, View, Text } from "react-native";
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +8,6 @@ import CustomTextInput from "@/components/CustomTextInput";
 import Button from "@/components/Button";
 import { registerSchema, RegisterFormData } from "@/schemas/register";
 import { useRouter } from "expo-router";
-import { Screens } from "../_layout";
 import barrakinhaService, {
   OtpType,
 } from "@/services/barrakinha/barrakinha.service";
@@ -41,7 +40,7 @@ export default function Register() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background mt-4">
       <Header
         title="Cadastro"
         subtitle="Preencha os campos abaixo para criar sua conta."
@@ -126,19 +125,29 @@ export default function Register() {
           />
         </View>
 
-        <Text style={styles.formFooter}>
-          Ao clicar em "Continuar", você concorda com nossos
-          <Text style={{ color: "#45464E", fontWeight: "600" }}>
-            {" "}
-            Termos e Condições{" "}
-          </Text>
-          e
-          <Text style={{ color: "#45464E", fontWeight: "600" }}>
-            {" "}
+        <Text className="text-[15px] leading-[22px] font-normal text-muted text-center">
+          Ao continuar, você concorda com nossos
+          {"\n "}
+          <Text className="text-accent font-semibold underline decoration-black decoration-solid">
+            Termos e Condições
+          </Text>{" "}
+          e{" "}
+          <Text className="text-accent font-semibold underline decoration-black decoration-solid">
             Política de Privacidade
           </Text>
           .
         </Text>
+
+        <TouchableOpacity
+          className="mt-4"
+          onPress={() => {
+            router.replace("/sign-in");
+          }}
+        >
+          <Text className="text-[15px] leading-[22px] font-normal text-muted text-center">
+            Já tem uma conta? <Text className="text-accent font-semibold underline decoration-black decoration-solid">Entre</Text>
+          </Text>
+        </TouchableOpacity>
       </KeyboardAwareScrollView>
     </SafeAreaView>
   );
@@ -194,5 +203,13 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     fontWeight: "bold",
     color: "#fff",
+  },
+  formLink: {
+    textAlign: "right",
+    fontWeight: "600",
+    color: "var(--color-primary)",
+    textDecorationLine: "underline",
+    textDecorationColor: "var(--color-primary)",
+    textDecorationStyle: "solid",
   },
 });
