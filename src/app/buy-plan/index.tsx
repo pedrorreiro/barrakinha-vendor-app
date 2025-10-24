@@ -1,21 +1,22 @@
 import { StyleSheet, SafeAreaView, View, Text } from "react-native";
 import FeatherIcon from "@expo/vector-icons/Feather";
 import Button from "@/components/Button";
+import { useRouter } from "expo-router";
+import Header from "@/components/Header";
 
 export default function BuyPlan() {
+  const router = useRouter();
+
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background mt-4" >
+      <Header
+        title="Comece a vender hoje mesmo"
+        subtitle="Ganhe visibilidade em toda a região com nosso sistema."
+        showBackButton={true}
+      />
+
       <View className="p-2 pt-8 flex-grow flex-shrink flex-basis-0">
         <View className="flex-col items-start pt-4 px-4 flex-grow flex-shrink flex-basis-0">
-          <Text className="text-[24px] font-bold text-foreground mb-3">
-            Comece a vender hoje mesmo
-          </Text>
-
-          <Text style={styles.paywallDescription}>
-            Transforme seu negócio com nossa plataforma de vendas. Sem
-            mensalidade, sem complicação.
-          </Text>
-
           <View className="feature">
             <View className="feature-icon">
               <FeatherIcon color="#fff" name="dollar-sign" size={24} />
@@ -64,14 +65,9 @@ export default function BuyPlan() {
               size="large"
               title="Começar a vender"
               onPress={() => {
-                // handle onPress
+                router.replace("/register");
               }}
             />
-
-            <Text style={styles.paywallFooterText}>
-              Taxa de apenas 1,5% por venda realizada. Sem mensalidade, sem taxa
-              de adesão.
-            </Text>
           </View>
         </View>
       </View>

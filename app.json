@@ -20,6 +20,9 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
+    },
+    "android": {
+      "package": "com.barrakinha.barrakinhavendedor"
     }
   }
 }
