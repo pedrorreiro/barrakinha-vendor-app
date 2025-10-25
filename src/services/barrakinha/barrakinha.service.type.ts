@@ -7,6 +7,10 @@ export type RefreshTokenResponse = {
   refreshToken: string;
 };
 
+export type ValidateStoreResponse = {
+  refreshToken: string;
+};
+
 export type GetStoreMeResponse = {
   id: string;
   name: string;

@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +12,8 @@ import barrakinhaService, {
   OtpType,
 } from "@/services/barrakinha/barrakinha.service";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Screens } from "@/enums";
+import { Toast } from "toastify-react-native";
 
 export default function Register() {
   const router = useRouter();
@@ -32,12 +34,39 @@ export default function Register() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      await barrakinhaService.createStore(data);
-      await barrakinhaService.sendOtpCode(data.phone, OtpType.STORE_VALIDATION);
-      router.push({
-        pathname: "/otp-code/[phone]",
-        params: { phone: data.phone, otpType: OtpType.STORE_VALIDATION },
-      });
+      const createStoreResult = await barrakinhaService.createStore(data);
+      if (createStoreResult.isWrong()) {
+        if (createStoreResult.value.message === "ShouldValidateStore") {
+          Alert.alert(
+            "Loja já cadastrada",
+            "Você já tem uma loja cadastrada. Deseja ativar a loja?",
+            [
+              {
+                text: "Cancelar",
+                onPress: () => {
+                  return;
+                },
+              },
+              {
+                text: "Ativar",
+                onPress: async () => {
+                  const sendOtpCodeResult = await barrakinhaService.sendOtpCode(
+                    data.phone,
+                    OtpType.STORE_VALIDATION
+                  );
+
+                  if (sendOtpCodeResult.isWrong()) return;
+
+                  router.push({
+                    pathname: `/otp-code/${data.phone}`,
+                    params: { otpType: OtpType.STORE_VALIDATION.toString() },
+                  });
+                },
+              },
+            ]
+          );
+        } else return;
+      }
     } catch (error) {}
   };
 

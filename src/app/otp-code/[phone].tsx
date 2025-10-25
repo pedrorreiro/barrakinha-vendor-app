@@ -13,6 +13,8 @@ import barrakinhaService, {
 import { Screens } from "@/enums";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
+import { storage, StorageKeys } from "@/utils/storage";
+import { ValidateStoreResponse } from "@/services/barrakinha/barrakinha.service.type";
 
 type OtpCodeParams = {
   phone: string;
@@ -26,7 +28,7 @@ export default function OtpCode() {
   const [code, setCode] = useState("");
   const [failedCode, setFailedCode] = useState<string>("");
 
-  const { login } = useAuth();
+  const { login, isAuthenticated, refreshToken, checkAuth } = useAuth();
   const router = useRouter();
 
   const nextScreen = useMemo(() => {
@@ -55,11 +57,24 @@ export default function OtpCode() {
       }
 
       if (otpType === OtpType.STORE_VALIDATION) {
-        const result = await barrakinhaService.validateStore(code, phone);
-        if (result.isWrong()) return;
+        const validateStoreResult = await barrakinhaService.validateStore(
+          code,
+          phone
+        );
+        if (validateStoreResult.isWrong()) return;
 
-        Toast.success("Loja validada com sucesso");
-        router.replace(nextScreen);
+        const validateStoreResponse =
+          validateStoreResult.value as unknown as ValidateStoreResponse;
+
+        await storage.set<string>(
+          StorageKeys.REFRESH_TOKEN,
+          validateStoreResponse.refreshToken
+        );
+
+        await refreshToken();
+        await checkAuth();
+
+        router.replace(Screens.HOME);
       }
     } catch (error) {
       // Em caso de erro, armazena o código que falhou

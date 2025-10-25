@@ -1,13 +1,22 @@
-import axios, { AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from "axios";
 import { CreateStoreRequest, CreateStoreResponse } from "@/types/store";
 import {
   GetStoreMeResponse,
   LoginResponse,
   RefreshTokenResponse,
+  ValidateStoreResponse,
 } from "./barrakinha.service.type";
 import { Toast } from "toastify-react-native";
 import { Either, right, wrong } from "@/utils/either";
 import { storage, StorageKeys } from "@/utils/storage";
+import { Screens } from "@/enums";
+import { router } from "expo-router";
+
+// Interface estendida para incluir propriedades customizadas
+interface CustomAxiosRequestConfig extends AxiosRequestConfig {
+  _retry?: boolean;
+  _isRefreshRequest?: boolean;
+}
 
 export enum OtpType {
   STORE_VALIDATION = "STORE_VALIDATION",
@@ -52,7 +61,11 @@ class BarrakinhaService {
       async (error) => {
         const originalRequest = error.config;
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (
+          error.response?.status === 401 &&
+          !originalRequest._retry &&
+          !originalRequest._isRefreshRequest // Evita loop infinito se o refresh token falhar
+        ) {
           originalRequest._retry = true;
 
           try {
@@ -84,7 +97,21 @@ class BarrakinhaService {
 
                 // Refazer a requisição original
                 return this.api(originalRequest);
+              } else {
+                console.log(
+                  "[BarrakinhaService] Falha ao renovar token, redirecionando para login..."
+                );
+                await storage.delete(StorageKeys.ACCESS_TOKEN);
+                await storage.delete(StorageKeys.REFRESH_TOKEN);
+                router.replace(Screens.WELCOME);
               }
+            } else {
+              console.log(
+                "[BarrakinhaService] Sem refresh token, redirecionando para login..."
+              );
+              await storage.delete(StorageKeys.ACCESS_TOKEN);
+              await storage.delete(StorageKeys.REFRESH_TOKEN);
+              router.replace(Screens.WELCOME);
             }
           } catch (refreshError) {
             console.log(
@@ -94,6 +121,7 @@ class BarrakinhaService {
             // Se falhar o refresh, limpar tokens e redirecionar para login
             await storage.delete(StorageKeys.ACCESS_TOKEN);
             await storage.delete(StorageKeys.REFRESH_TOKEN);
+            router.replace(Screens.WELCOME);
           }
         }
 
@@ -130,15 +158,21 @@ class BarrakinhaService {
 
   async createStore(
     storeData: CreateStoreRequest
-  ): Promise<CreateStoreResponse> {
+  ): Promise<Either<Error, CreateStoreResponse>> {
     try {
       const response: AxiosResponse<CreateStoreResponse> = await this.api.post(
         "/store",
         storeData
       );
-      return response.data;
+      return right(response.data);
     } catch (error) {
-      throw error;
+      console.log(error?.response?.data);
+      const errorName = error?.response?.data?.name;
+      if (errorName === "StoreNotActiveAlreadyExists") {
+        return wrong(new Error("ShouldValidateStore"));
+      }
+
+      return wrong(error);
     }
   }
 
@@ -173,9 +207,14 @@ class BarrakinhaService {
     refreshToken: string
   ): Promise<Either<Error, RefreshTokenResponse>> {
     try {
+      const config: CustomAxiosRequestConfig = {
+        _isRefreshRequest: true, // Flag para identificar que é uma requisição de refresh
+      };
+
       const response: AxiosResponse<RefreshTokenResponse> = await this.api.post(
         `/auth/refresh-token`,
-        { refreshToken }
+        { refreshToken },
+        config
       );
       return right(response.data);
     } catch (error) {
@@ -186,10 +225,13 @@ class BarrakinhaService {
   async validateStore(
     code: string,
     phone: string
-  ): Promise<Either<void, Error>> {
+  ): Promise<Either<ValidateStoreResponse, Error>> {
     try {
-      await this.api.post("/store/validate", { otpCode: code, phone });
-      return right(undefined);
+      const response = await this.api.post("/store/validate", {
+        otpCode: code,
+        phone,
+      });
+      return right(response.data);
     } catch (error) {
       return wrong(error);
     }

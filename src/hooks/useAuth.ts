@@ -11,21 +11,19 @@ export function useAuth() {
 
   const router = useRouter();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const refreshToken = await storage.get<string>(
-          StorageKeys.REFRESH_TOKEN
-        );
-        setIsAuthenticated(!!refreshToken);
-      } catch (error) {
-        console.error("Erro ao verificar autenticação:", error);
-        setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const checkAuth = async () => {
+    try {
+      const refreshToken = await storage.get<string>(StorageKeys.REFRESH_TOKEN);
+      setIsAuthenticated(!!refreshToken);
+    } catch (error) {
+      console.error("Erro ao verificar autenticação:", error);
+      setIsAuthenticated(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     checkAuth();
   }, []);
 
@@ -41,6 +39,9 @@ export function useAuth() {
         StorageKeys.REFRESH_TOKEN,
         result.value.refreshToken
       );
+
+      await refreshToken();
+
       setIsAuthenticated(true);
       return right(undefined);
     } catch (error) {
@@ -91,6 +92,7 @@ export function useAuth() {
     login,
     logout,
     refreshToken,
+    checkAuth,
     isAuthenticated,
     isLoading,
   };
