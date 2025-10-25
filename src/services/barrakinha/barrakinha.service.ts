@@ -166,7 +166,6 @@ class BarrakinhaService {
       );
       return right(response.data);
     } catch (error) {
-      console.log(error?.response?.data);
       const errorName = error?.response?.data?.name;
       if (errorName === "StoreNotActiveAlreadyExists") {
         return wrong(new Error("ShouldValidateStore"));
