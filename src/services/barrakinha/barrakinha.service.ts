@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from "axios";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { CreateStoreRequest, CreateStoreResponse } from "@/types/store";
 import {
   GetStoreMeResponse,
@@ -6,17 +6,14 @@ import {
   RefreshTokenResponse,
   ValidateStoreResponse,
 } from "./barrakinha.service.type";
-import { Toast } from "toastify-react-native";
 import { Either, right, wrong } from "@/utils/either";
 import { storage, StorageKeys } from "@/utils/storage";
-import { Screens } from "@/enums";
-import { router } from "expo-router";
-
-// Interface estendida para incluir propriedades customizadas
-interface CustomAxiosRequestConfig extends AxiosRequestConfig {
-  _retry?: boolean;
-  _isRefreshRequest?: boolean;
-}
+import {
+  CustomAxiosRequestConfig,
+  shouldRefreshToken,
+  handleTokenRefresh,
+  handleErrorDisplay,
+} from "./utils";
 
 export enum OtpType {
   STORE_VALIDATION = "STORE_VALIDATION",
@@ -55,90 +52,24 @@ class BarrakinhaService {
 
     // Interceptor para logs de respostas e tratamento de token expirado
     this.api.interceptors.response.use(
-      (response) => {
-        return response;
-      },
+      (response) => response,
       async (error) => {
         const originalRequest = error.config;
 
-        if (
-          error.response?.status === 401 &&
-          !originalRequest._retry &&
-          !originalRequest._isRefreshRequest // Evita loop infinito se o refresh token falhar
-        ) {
-          originalRequest._retry = true;
-
-          try {
-            const refreshToken = await storage.get<string>(
-              StorageKeys.REFRESH_TOKEN
-            );
-
-            if (refreshToken) {
-              console.log(
-                "[BarrakinhaService] Token expirado, tentando refresh..."
-              );
-
-              const refreshResult = await this.refreshToken(refreshToken);
-
-              if (refreshResult.isRight()) {
-                const { accessToken, refreshToken: newRefreshToken } =
-                  refreshResult.value;
-
-                // Salvar novos tokens
-                await storage.set(StorageKeys.ACCESS_TOKEN, accessToken);
-                await storage.set(StorageKeys.REFRESH_TOKEN, newRefreshToken);
-
-                // Atualizar header da requisição original
-                originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-
-                console.log(
-                  "[BarrakinhaService] Token renovado, refazendo requisição..."
-                );
-
-                // Refazer a requisição original
-                return this.api(originalRequest);
-              } else {
-                console.log(
-                  "[BarrakinhaService] Falha ao renovar token, redirecionando para login..."
-                );
-                await storage.delete(StorageKeys.ACCESS_TOKEN);
-                await storage.delete(StorageKeys.REFRESH_TOKEN);
-                router.replace(Screens.WELCOME);
-              }
-            } else {
-              console.log(
-                "[BarrakinhaService] Sem refresh token, redirecionando para login..."
-              );
-              await storage.delete(StorageKeys.ACCESS_TOKEN);
-              await storage.delete(StorageKeys.REFRESH_TOKEN);
-              router.replace(Screens.WELCOME);
-            }
-          } catch (refreshError) {
-            console.log(
-              "[BarrakinhaService] Erro ao renovar token:",
-              refreshError
-            );
-            // Se falhar o refresh, limpar tokens e redirecionar para login
-            await storage.delete(StorageKeys.ACCESS_TOKEN);
-            await storage.delete(StorageKeys.REFRESH_TOKEN);
-            router.replace(Screens.WELCOME);
+        // Verifica se precisa renovar o token
+        if (shouldRefreshToken(error, originalRequest)) {
+          const refreshResult = await handleTokenRefresh(
+            originalRequest,
+            this.refreshToken.bind(this),
+            this.api
+          );
+          if (refreshResult) {
+            return refreshResult;
           }
         }
 
-        const errorMessage = error.response?.data.message || error.message;
-
-        if (errorMessage)
-          Toast.show({
-            text1: "Oops! 😅 ",
-            text2: errorMessage,
-            type: "error",
-          });
-        else {
-          console.log(
-            "[BarrakinhaService] Response error:",
-            error.response?.data || error.message
-          );
-        }
+        // Exibe erro para o usuário
+        handleErrorDisplay(error);
 
         return Promise.reject(error);
       }
