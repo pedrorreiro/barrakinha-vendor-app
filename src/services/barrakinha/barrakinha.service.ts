@@ -20,13 +20,14 @@ export enum OtpType {
   STORE_AUTHENTICATION = "STORE_AUTHENTICATION",
 }
 
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
 class BarrakinhaService {
   private api: AxiosInstance;
 
   constructor() {
     this.api = axios.create({
-      baseURL:
-        "https://resistant-conservative-especially-vary.trycloudflare.com",
+      baseURL: apiUrl,
       timeout: 10000,
       headers: {
         "Content-Type": "application/json",

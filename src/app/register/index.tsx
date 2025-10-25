@@ -38,17 +38,12 @@ export default function Register() {
       if (createStoreResult.isWrong()) {
         if (createStoreResult.value.message === "ShouldValidateStore") {
           Alert.alert(
-            "Loja já cadastrada",
-            "Você já tem uma loja cadastrada. Deseja ativar a loja?",
+            "Oops! 😅 ",
+            "Parece que já existe uma loja cadastrada com este telefone ou e-mail, mas ela ainda não foi ativada. Deseja ativar a loja agora?",
             [
+              { text: "Cancelar", style: "cancel" },
               {
-                text: "Cancelar",
-                onPress: () => {
-                  return;
-                },
-              },
-              {
-                text: "Ativar",
+                text: "Ativar Loja",
                 onPress: async () => {
                   const sendOtpCodeResult = await barrakinhaService.sendOtpCode(
                     data.phone,
@@ -65,9 +60,22 @@ export default function Register() {
               },
             ]
           );
-        } else return;
+        }
+
+        return;
       }
     } catch (error) {}
+
+    const sendOtpCodeResult = await barrakinhaService.sendOtpCode(
+      data.phone,
+      OtpType.STORE_VALIDATION
+    );
+    if (sendOtpCodeResult.isWrong()) return;
+
+    router.push({
+      pathname: `/otp-code/${data.phone}`,
+      params: { otpType: OtpType.STORE_VALIDATION.toString() },
+    });
   };
 
   return (

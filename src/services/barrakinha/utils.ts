@@ -62,7 +62,10 @@ export async function logoutAndRedirect(message: string) {
  * Exibe erro para o usuário
  */
 export function handleErrorDisplay(error: any) {
-  const errorMessage = error.response?.data.message || error.message;
+  let errorMessage = error.response?.data.message || error.message;
+  if (errorMessage === "Network Error") {
+    errorMessage = "Erro de conexão. Verifique sua internet e tente novamente.";
+  }
 
   if (errorMessage) {
     Toast.show({

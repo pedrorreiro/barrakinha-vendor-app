@@ -88,10 +88,16 @@ export function useAuth() {
     }
   };
 
+  const setRefreshToken = async (refreshToken: string) => {
+    await storage.set<string>(StorageKeys.REFRESH_TOKEN, refreshToken);
+    await checkAuth();
+  };
+
   return {
     login,
     logout,
     refreshToken,
+    setRefreshToken,
     checkAuth,
     isAuthenticated,
     isLoading,

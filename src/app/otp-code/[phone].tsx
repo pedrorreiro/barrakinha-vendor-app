@@ -1,20 +1,16 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useAuth } from "@/hooks/useAuth";
+import { useOtpVerification } from "@/hooks/useOtpVerification";
 import Header from "@/components/Header";
 import Button from "@/components/Button";
 import OtpInput from "@/components/OtpInput";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { maskPhoneNumberForPublicDisplay } from "@/utils/phone";
-import barrakinhaService, {
-  OtpType,
-} from "@/services/barrakinha/barrakinha.service";
-import { Screens } from "@/enums";
+import { OtpType } from "@/services/barrakinha/barrakinha.service";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
-import { storage, StorageKeys } from "@/utils/storage";
-import { ValidateStoreResponse } from "@/services/barrakinha/barrakinha.service.type";
 
 type OtpCodeParams = {
   phone: string;
@@ -24,77 +20,34 @@ type OtpCodeParams = {
 export default function OtpCode() {
   const { phone, otpType } = useLocalSearchParams<OtpCodeParams>();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [code, setCode] = useState("");
-  const [failedCode, setFailedCode] = useState<string>("");
+  const { login, refreshToken, checkAuth } = useAuth();
 
-  const { login, isAuthenticated, refreshToken, checkAuth } = useAuth();
-  const router = useRouter();
-
-  const nextScreen = useMemo(() => {
-    return {
-      [OtpType.STORE_AUTHENTICATION]: Screens.HOME,
-      [OtpType.STORE_VALIDATION]: Screens.WELCOME,
-    }[otpType as OtpType];
-  }, [otpType]);
+  const {
+    isLoading,
+    code,
+    failedCode,
+    nextScreen,
+    setCode,
+    handleVerifyCode,
+    handleResendCode,
+  } = useOtpVerification({
+    phone,
+    otpType: otpType as OtpType,
+    login,
+    refreshToken,
+    checkAuth,
+  });
 
   const maskedPhone = useMemo(
     () => maskPhoneNumberForPublicDisplay(phone),
     [phone]
   );
 
-  const handleVerifyCode = async (code: string) => {
-    if (isLoading) return;
-
-    setIsLoading(true);
-
-    try {
-      if (otpType === OtpType.STORE_AUTHENTICATION) {
-        const loginResult = await login(code, phone);
-        if (loginResult.isWrong()) return;
-
-        router.replace(nextScreen);
-      }
-
-      if (otpType === OtpType.STORE_VALIDATION) {
-        const validateStoreResult = await barrakinhaService.validateStore(
-          code,
-          phone
-        );
-        if (validateStoreResult.isWrong()) return;
-
-        const validateStoreResponse =
-          validateStoreResult.value as unknown as ValidateStoreResponse;
-
-        await storage.set<string>(
-          StorageKeys.REFRESH_TOKEN,
-          validateStoreResponse.refreshToken
-        );
-
-        await refreshToken();
-        await checkAuth();
-
-        router.replace(Screens.HOME);
-      }
-    } catch (error) {
-      // Em caso de erro, armazena o código que falhou
-      setFailedCode(code);
-    } finally {
-      setIsLoading(false);
-      setCode("");
+  const onResendCode = async () => {
+    const success = await handleResendCode();
+    if (success) {
+      Toast.success("Código reenviado!");
     }
-  };
-
-  const handleResendCode = async () => {
-    const result = await barrakinhaService.sendOtpCode(
-      phone,
-      otpType as OtpType
-    );
-
-    if (result.isWrong()) return;
-
-    setCode("");
-    Toast.success("Código reenviado!");
   };
 
   return (
@@ -122,7 +75,7 @@ export default function OtpCode() {
             <Button
               variant="outline"
               title="Reenviar código"
-              onPress={handleResendCode}
+              onPress={onResendCode}
             />
           </View>
         </View>
