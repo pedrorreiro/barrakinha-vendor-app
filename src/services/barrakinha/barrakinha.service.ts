@@ -44,12 +44,59 @@ class BarrakinhaService {
       }
     );
 
-    // Interceptor para logs de respostas (opcional)
+    // Interceptor para logs de respostas e tratamento de token expirado
     this.api.interceptors.response.use(
       (response) => {
         return response;
       },
-      (error) => {
+      async (error) => {
+        const originalRequest = error.config;
+
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+
+          try {
+            const refreshToken = await storage.get<string>(
+              StorageKeys.REFRESH_TOKEN
+            );
+
+            if (refreshToken) {
+              console.log(
+                "[BarrakinhaService] Token expirado, tentando refresh..."
+              );
+
+              const refreshResult = await this.refreshToken(refreshToken);
+
+              if (refreshResult.isRight()) {
+                const { accessToken, refreshToken: newRefreshToken } =
+                  refreshResult.value;
+
+                // Salvar novos tokens
+                await storage.set(StorageKeys.ACCESS_TOKEN, accessToken);
+                await storage.set(StorageKeys.REFRESH_TOKEN, newRefreshToken);
+
+                // Atualizar header da requisição original
+                originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+                console.log(
+                  "[BarrakinhaService] Token renovado, refazendo requisição..."
+                );
+
+                // Refazer a requisição original
+                return this.api(originalRequest);
+              }
+            }
+          } catch (refreshError) {
+            console.log(
+              "[BarrakinhaService] Erro ao renovar token:",
+              refreshError
+            );
+            // Se falhar o refresh, limpar tokens e redirecionar para login
+            await storage.delete(StorageKeys.ACCESS_TOKEN);
+            await storage.delete(StorageKeys.REFRESH_TOKEN);
+          }
+        }
+
         const errorMessage = error.response?.data.message || error.message;
 
         if (errorMessage)
